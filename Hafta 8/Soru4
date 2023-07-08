@@ -1,0 +1,18 @@
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+    const char* metinler[] = { "apple", "application", "banana", "art", "ball", "cat" };
+    int metinSayisi = sizeof(metinler) / sizeof(metinler[0]);
+    const char* baslayanMetin = "app";
+
+    printf("Belirli metinden baslayan kelimeler:\n");
+
+    for (int i = 0; i < metinSayisi; i++) {
+        if (strncmp(metinler[i], baslayanMetin, strlen(baslayanMetin)) == 0) {
+            printf("%s\n", metinler[i]);
+        }
+    }
+
+    return 0;
+}
