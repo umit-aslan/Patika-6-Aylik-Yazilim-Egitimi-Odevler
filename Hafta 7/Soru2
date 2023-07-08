@@ -1,0 +1,25 @@
+#include <stdio.h>
+
+int factorial(int n) {
+    int result = 1;
+    
+    while (n > 0) {
+        result *= n;
+        n--;
+    }
+    
+    return result;
+}
+
+int main() {
+    int number;
+    
+    printf("Bir sayı girin: ");
+    scanf("%d", &number);
+    
+    int result = factorial(number);
+    
+    printf("Sonuç: %d\n", result);
+    
+    return 0;
+}
