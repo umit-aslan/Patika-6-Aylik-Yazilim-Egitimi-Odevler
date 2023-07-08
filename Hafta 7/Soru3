@@ -1,0 +1,18 @@
+#include <stdio.h>
+
+int main() {
+    int number1, number2;
+    int *ptr1, *ptr2;
+
+    number1 = 10;
+    number2 = 20;
+
+    ptr1 = &number1;
+    ptr2 = &number2;
+
+    printf("Değerler:\n");
+    printf("number1: %d\n", *ptr1);
+    printf("number2: %d\n", *ptr2);
+
+    return 0;
+}
