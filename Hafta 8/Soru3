@@ -1,0 +1,30 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_SIZE 100
+
+// Tekrar eden elemanları bulmak için hash tablosu kullanılıyor
+void tekrarEdenleriBul(int dizi[], int size) {
+    int hashTablosu[MAX_SIZE] = {0};
+
+    printf("Dizideki tekrar eden elemanlar: ");
+
+    for (int i = 0; i < size; i++) {
+        hashTablosu[dizi[i]]++;
+
+        if (hashTablosu[dizi[i]] > 1) {
+            printf("%d ", dizi[i]);
+        }
+    }
+
+    printf("\n");
+}
+
+int main() {
+    int dizi[] = {1, 2, 3, 2, 4, 5, 3, 6, 6};
+    int size = sizeof(dizi) / sizeof(dizi[0]);
+
+    tekrarEdenleriBul(dizi, size);
+
+    return 0;
+}
