@@ -1,0 +1,289 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Kullanıcı verilerini saklamak için bir yapı tanımlayalım
+typedef struct {
+    char isim[50];
+    int hesapNo;
+    float bakiye;
+} Kullanici;
+
+// Dosyadan kullanıcıları okuyan ve dosyaya kullanıcıları yazan fonksiyonlar
+void dosyadanKullanicilariOku(Kullanici kullaniciListesi[], int *kullaniciSayisi);
+void dosyayaKullanicilariYaz(Kullanici kullaniciListesi[], int kullaniciSayisi);
+
+// Kullanıcı kayıt işlemlerini gerçekleştiren fonksiyonlar
+void yeniHesapOlustur(Kullanici kullaniciListesi[], int *kullaniciSayisi);
+void hesapGuncelle(Kullanici kullaniciListesi[], int kullaniciSayisi);
+void hesapSil(Kullanici kullaniciListesi[], int *kullaniciSayisi);
+
+// Hesap işlemlerini gerçekleştiren fonksiyonlar
+void hesabaGiris(Kullanici kullaniciListesi[], int kullaniciSayisi);
+void bakiyeGoruntule(Kullanici kullaniciListesi[], int kullaniciSayisi, int hesapNo);
+void bakiyeGuncelle(Kullanici kullaniciListesi[], int kullaniciSayisi, int hesapNo, float miktar);
+void paraYatir(Kullanici kullaniciListesi[], int kullaniciSayisi, int hesapNo);
+void paraCek(Kullanici kullaniciListesi[], int kullaniciSayisi, int hesapNo);
+
+int main() {
+    Kullanici kullaniciListesi[100];  // Maksimum 100 kullanıcı saklamak için dizi tanımlayalım
+    int kullaniciSayisi = 0;  // Kaydedilen kullanıcı sayısını tutmak için değişken
+
+    // Dosyadan kullanıcıları okuyalım
+    dosyadanKullanicilariOku(kullaniciListesi, &kullaniciSayisi);
+
+    int secim;
+    do {
+        // Kullanıcı arayüzünü oluşturalım
+        printf("\n----- Banka Hesap Yonetimi -----\n");
+        printf("1. Yeni hesap ac\n");
+        printf("2. Hesap guncelle\n");
+        printf("3. Hesap sil\n");
+        printf("4. Hesaba giris\n");
+        printf("5. Cikis\n");
+        printf("Seciminizi yapin: ");
+        scanf("%d", &secim);
+
+        switch (secim) {
+            case 1:
+                yeniHesapOlustur(kullaniciListesi, &kullaniciSayisi);
+                break;
+            case 2:
+                hesapGuncelle(kullaniciListesi, kullaniciSayisi);
+                break;
+            case 3:
+                hesapSil(kullaniciListesi, &kullaniciSayisi);
+                break;
+            case 4:
+                hesabaGiris(kullaniciListesi, kullaniciSayisi);
+                break;
+            case 5:
+                printf("Cikis yapildi.\n");
+                break;
+            default:
+                printf("Gecersiz secim. Tekrar deneyin.\n");
+                break;
+        }
+
+    } while (secim != 5);
+
+    // Program sonlandığında kullanıcıları dosyaya yazalım
+    dosyayaKullanicilariYaz(kullaniciListesi, kullaniciSayisi);
+
+    return 0;
+}
+
+void dosyadanKullanicilariOku(Kullanici kullaniciListesi[], int *kullaniciSayisi) {
+    FILE *dosya = fopen("kullanicilar.txt", "r");
+    if (dosya == NULL) {
+        printf("Dosya okunamadi.\n");
+        return;
+    }
+
+    while (!feof(dosya)) {
+        fscanf(dosya, "%s %d %f", kullaniciListesi[*kullaniciSayisi].isim,
+               &kullaniciListesi[*kullaniciSayisi].hesapNo,
+               &kullaniciListesi[*kullaniciSayisi].bakiye);
+        (*kullaniciSayisi)++;
+    }
+
+    fclose(dosya);
+}
+
+void dosyayaKullanicilariYaz(Kullanici kullaniciListesi[], int kullaniciSayisi) {
+    FILE *dosya = fopen("kullanicilar.txt", "w");
+    if (dosya == NULL) {
+        printf("Dosya yazilamadi.\n");
+        return;
+    }
+
+    for (int i = 0; i < kullaniciSayisi; i++) {
+        fprintf(dosya, "%s %d %.2f\n", kullaniciListesi[i].isim,
+                kullaniciListesi[i].hesapNo, kullaniciListesi[i].bakiye);
+    }
+
+    fclose(dosya);
+}
+
+void yeniHesapOlustur(Kullanici kullaniciListesi[], int *kullaniciSayisi) {
+    printf("Isim: ");
+    scanf("%s", kullaniciListesi[*kullaniciSayisi].isim);
+    printf("Hesap No: ");
+    scanf("%d", &kullaniciListesi[*kullaniciSayisi].hesapNo);
+    printf("Baslangic Bakiye: ");
+    scanf("%f", &kullaniciListesi[*kullaniciSayisi].bakiye);
+    (*kullaniciSayisi)++;
+    printf("Hesap basariyla olusturuldu.\n");
+}
+
+void hesapGuncelle(Kullanici kullaniciListesi[], int kullaniciSayisi) {
+    int hesapNo;
+    printf("Guncellenecek hesap No: ");
+    scanf("%d", &hesapNo);
+
+    int i;
+    for (i = 0; i < kullaniciSayisi; i++) {
+        if (kullaniciListesi[i].hesapNo == hesapNo) {
+            printf("Yeni isim: ");
+            scanf("%s", kullaniciListesi[i].isim);
+            printf("Yeni bakiye: ");
+            scanf("%f", &kullaniciListesi[i].bakiye);
+            printf("Hesap basariyla guncellendi.\n");
+            break;
+        }
+    }
+
+    if (i == kullaniciSayisi) {
+        printf("Hesap bulunamadi.\n");
+    }
+}
+
+void hesapSil(Kullanici kullaniciListesi[], int *kullaniciSayisi) {
+    int hesapNo;
+    printf("Silinecek hesap No: ");
+    scanf("%d", &hesapNo);
+
+    int i, j;
+    for (i = 0; i < *kullaniciSayisi; i++) {
+        if (kullaniciListesi[i].hesapNo == hesapNo) {
+            for (j = i; j < *kullaniciSayisi - 1; j++) {
+                kullaniciListesi[j] = kullaniciListesi[j + 1];
+            }
+            (*kullaniciSayisi)--;
+            printf("Hesap basariyla silindi.\n");
+            break;
+        }
+    }
+
+    if (i == *kullaniciSayisi) {
+        printf("Hesap bulunamadi.\n");
+    }
+}
+
+void hesabaGiris(Kullanici kullaniciListesi[], int kullaniciSayisi) {
+    int hesapNo;
+    printf("Hesap No: ");
+    scanf("%d", &hesapNo);
+
+    int i;
+    for (i = 0; i < kullaniciSayisi; i++) {
+        if (kullaniciListesi[i].hesapNo == hesapNo) {
+            printf("Giris basarili.\n");
+            int secim;
+            do {
+                printf("\n----- Hesap Islemleri -----\n");
+                printf("1. Bakiye goruntule\n");
+                printf("2. Bakiye guncelle\n");
+                printf("3. Para yatir\n");
+                printf("4. Para cek\n");
+                printf("5. Hesaptan cikis\n");
+                printf("Seciminizi yapin: ");
+                scanf("%d", &secim);
+
+                switch (secim) {
+                    case 1:
+                        bakiyeGoruntule(kullaniciListesi, kullaniciSayisi, hesapNo);
+                        break;
+                    case 2:
+                        printf("Yeni bakiye: ");
+                        float yeniBakiye;
+                        scanf("%f", &yeniBakiye);
+                        bakiyeGuncelle(kullaniciListesi, kullaniciSayisi, hesapNo, yeniBakiye);
+                        break;
+                    case 3:
+                        paraYatir(kullaniciListesi, kullaniciSayisi, hesapNo);
+                        break;
+                    case 4:
+                        paraCek(kullaniciListesi, kullaniciSayisi, hesapNo);
+                        break;
+                    case 5:
+                        printf("Hesaptan cikis yapildi.\n");
+                        break;
+                    default:
+                        printf("Gecersiz secim. Tekrar deneyin.\n");
+                        break;
+                }
+
+            } while (secim != 5);
+
+            break;
+        }
+    }
+
+    if (i == kullaniciSayisi) {
+        printf("Hesap bulunamadi.\n");
+    }
+}
+
+void bakiyeGoruntule(Kullanici kullaniciListesi[], int kullaniciSayisi, int hesapNo) {
+    int i;
+    for (i = 0; i < kullaniciSayisi; i++) {
+        if (kullaniciListesi[i].hesapNo == hesapNo) {
+            printf("Hesap No: %d\n", kullaniciListesi[i].hesapNo);
+            printf("Isim: %s\n", kullaniciListesi[i].isim);
+            printf("Bakiye: %.2f\n", kullaniciListesi[i].bakiye);
+            break;
+        }
+    }
+
+    if (i == kullaniciSayisi) {
+        printf("Hesap bulunamadi.\n");
+    }
+}
+
+void bakiyeGuncelle(Kullanici kullaniciListesi[], int kullaniciSayisi, int hesapNo, float miktar) {
+    int i;
+    for (i = 0; i < kullaniciSayisi; i++) {
+        if (kullaniciListesi[i].hesapNo == hesapNo) {
+            kullaniciListesi[i].bakiye = miktar;
+            printf("Bakiye guncellendi.\n");
+            break;
+        }
+    }
+
+    if (i == kullaniciSayisi) {
+        printf("Hesap bulunamadi.\n");
+    }
+}
+
+void paraYatir(Kullanici kullaniciListesi[], int kullaniciSayisi, int hesapNo) {
+    float miktar;
+    printf("Yatirilacak miktar: ");
+    scanf("%f", &miktar);
+
+    int i;
+    for (i = 0; i < kullaniciSayisi; i++) {
+        if (kullaniciListesi[i].hesapNo == hesapNo) {
+            kullaniciListesi[i].bakiye += miktar;
+            printf("Para yatirildi.\n");
+            break;
+        }
+    }
+
+    if (i == kullaniciSayisi) {
+        printf("Hesap bulunamadi.\n");
+    }
+}
+
+void paraCek(Kullanici kullaniciListesi[], int kullaniciSayisi, int hesapNo) {
+    float miktar;
+    printf("Cekilecek miktar: ");
+    scanf("%f", &miktar);
+
+    int i;
+    for (i = 0; i < kullaniciSayisi; i++) {
+        if (kullaniciListesi[i].hesapNo == hesapNo) {
+            if (kullaniciListesi[i].bakiye >= miktar) {
+                kullaniciListesi[i].bakiye -= miktar;
+                printf("Para cekildi.\n");
+            } else {
+                printf("Yetersiz bakiye.\n");
+            }
+            break;
+        }
+    }
+
+    if (i == kullaniciSayisi) {
+        printf("Hesap bulunamadi.\n");
+    }
+}
