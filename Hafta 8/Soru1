@@ -1,0 +1,17 @@
+#include <stdio.h>
+
+int main() {
+    int dizi[] = {5, 12, 27, 8, 16, 3};
+    int uzunluk = sizeof(dizi) / sizeof(dizi[0]);
+    int enBuyuk = dizi[0]; // Başlangıçta en büyük sayıyı dizinin ilk elemanı olarak varsayıyoruz
+
+    for (int i = 1; i < uzunluk; i++) {
+        if (dizi[i] > enBuyuk) {
+            enBuyuk = dizi[i];
+        }
+    }
+
+    printf("Dizinin en büyük sayısı: %d\n", enBuyuk);
+
+    return 0;
+}
